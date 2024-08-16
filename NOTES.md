@@ -23,8 +23,7 @@ check `docker network ls`
 
 ## copy code
 ```
-$ rsync -avh ../hlf-docker-swarm/test-network man
-ager:/home/ubuntu
+$ rsync -avh --relative ./hlf-docker-swarm/test-network manager:/home/ubuntu/
 
 then make link 
 # ln -s /home/ubuntu/hlf-docker-swarm /root/hlf-docker-swarm
@@ -32,22 +31,30 @@ then make link
 
 ## label node
 ```
-docker node update --label-add name=manager 7jcyn7ef6istotpowvd0dtmxw
-docker node update --label-add name=worker1 x125ruaxxw1cbp9sn4eg7508e
-docker node update --label-add name=worker2 yjlxht0j5pqdzv65nava6k4sq
+sudo docker node update --label-add name=manager ysw70oqlxb1z4y6s5zinslacw
+sudo docker node update --label-add name=worker1 j13p1yht2sopek1jenn90o7oo
+sudo docker node update --label-add name=worker2 a27ehdcdo25tydnwppruesqvy
 
 # list label
-docker node ls -q | xargs docker node inspect \
+sudo docker node ls -q | sudo xargs docker node inspect \
   -f '{{ .ID }} [{{ .Description.Hostname }}]: {{ .Spec.Labels }}'
 ```
 
 ## run ca
 ```
-docker stack deploy -c docker/docker-compose-ca.yaml --network test hlf
+docker stack deploy -c docker/docker-compose-ca.yaml  hlf
 ```
 
 ## generate cat
 ```
+servers=("manager" "worker1" "worker2")
+
+for server in "${servers[@]}"; do
+    echo "Syncing to $server..."
+    rsync -avh --relative ./hlf-docker-swarm/bin "$server:/home/ubuntu/"
+    echo "Sync to $server completed."
+done
+
 $ source ./organizations/fabric-ca/registerEnroll.sh
 createOrderer
 createOrg1
@@ -57,21 +64,50 @@ createOrt3
 
 ## copy org2 and 3 to master node
 ```
+ssh-keygen -t ed25519 -C "iman@amandigital.net"
 $ sudo chown -R ubuntu:ubuntu ./
 
-rsync -avh ubuntu@worker1.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/org2/ ./org2
-rsync -avh ubuntu@worker2.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/org3/ ./org3
+servers=("worker1" "worker2")
+folders=("org2" "org3")
 
-rsync -avh ubuntu@worker1.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/org2.example.com ./peerOrganizations
+for i in "${!servers[@]}"; do
+    server="${servers[$i]}"
+    folder="${folders[$i]}"
+    
+    echo "Syncing from $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/$folder/ to ./$folder"
+    
+    rsync -avh "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/$folder/" "./$folder"
+    
+    echo "Sync to ./$folder completed."
+done
 
-rsync -avh ubuntu@worker2.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/org3.example.com ./peerOrganizations
+servers=("worker1" "worker2")
+orgs=("org2.example.com" "org3.example.com")
+
+for i in "${!servers[@]}"; do
+    server="${servers[$i]}"
+    org="${orgs[$i]}"
+    
+    echo "Syncing from $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/$org to ./peerOrganizations"
+    
+    rsync -avh "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/$org" "./peerOrganizations"
+    
+    echo "Sync to ./peerOrganizations completed."
+done
+
 
 ```
 ## copy orders to other node
 ```
-rsync -avh ./ordererOrganizations ubuntu@worker1.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/
+servers=("worker1" "worker2")
 
-rsync -avh ./ordererOrganizations ubuntu@worker2.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/
+for server in "${servers[@]}"; do
+    echo "Syncing ./ordererOrganizations to $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/"
+    
+    rsync -avh ./ordererOrganizations "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/"
+    
+    echo "Sync to $server.amandigital.net completed."
+done
 ```
 
 ## create genesis block
@@ -84,28 +120,53 @@ rsync -avh ./ordererOrganizations ubuntu@worker2.amandigital.net:/home/ubuntu/hl
 export CHANNEL_NAME=mychannel
 ./scripts/createChannelTx.sh
 
-rsync -avh ./channel-artifacts ubuntu@worker1.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/
-rsync -avh ./channel-artifacts ubuntu@worker2.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/
+servers=("worker1" "worker2")
+
+for server in "${servers[@]}"; do
+    echo "Syncing ./channel-artifacts to $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/"
+    
+    rsync -avh ./channel-artifacts "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/"
+    
+    echo "Sync to $server.amandigital.net completed."
+done
+
 ```
 
 ## start container
 ```
+servers=("manager" "worker1" "worker2")
+
+for server in "${servers[@]}"; do
+    echo "Syncing to $server..."
+    rsync -avh --relative ./hlf-docker-swarm/chaincode "$server:/home/ubuntu/"
+    echo "Sync to $server completed."
+done
+
 sudo docker stack deploy -c docker/docker-compose-couch.yaml -c docker/docker-compose-test-net.yaml hlf
 
-mkdir /home/ubuntu/hlf-docker-swarm/chaincode/
+
 ```
 
 ## create channel from cli tool
 ```
+$ sudo docker stack deploy -c docker/docker-compose-cli.yaml  hlf
 $ sudo docker exec -it dc8dd7d6502c bash
 export CHANNEL_NAME=mychannel
-./script/create_app_channel.sh
+./scripts/create_app_channel.sh
 ```
 
 ## join the channel , copy the block file to other peer
 ```
-rsync -avh ./channel-artifacts/mychannel.block ubuntu@worker1.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts
-rsync -avh ./channel-artifacts/mychannel.block ubuntu@worker2.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts
+servers=("worker1" "worker2")
+
+for server in "${servers[@]}"; do
+    echo "Syncing ./channel-artifacts/mychannel.block to $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts"
+    
+    rsync -avh ./channel-artifacts/mychannel.block "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts"
+    
+    echo "Sync to $server.amandigital.net completed."
+done
+
 
 $ peer channel join -b ./channel-artifacts/mychannel.block
 
@@ -129,10 +190,20 @@ export CC_NAME=basic
 ./scripts/package_cc.sh
 
 then copy to other peer
+servers=("worker1" "worker2")
+
+for server in "${servers[@]}"; do
+    
+    rsync -avh ./chaincode/basic.tar.gz "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/chaincode"
+    
+    echo "Sync to $server.amandigital.net completed."
+done
 ```
 
 ## chain code installation
 ```
+export CC_NAME=basic
+export CHANNEL_NAME=mychannel
 ./scripts/install_cc.sh
 ```
 
@@ -145,12 +216,16 @@ export CHANNEL_NAME=mychannel
 
 ## check readiness (whether all peer already approve)
 ```
+export CC_NAME=basic
+export CHANNEL_NAME=mychannel
 ./scripts/check_commit.sh
 ```
 
 ## commit the chaincode
 ```
-./scripts/commit_cc.sh
+export CC_NAME=basic
+export CHANNEL_NAME=mychannel
+./scripts/commit_cc.sh # one time only
 
 check the commited chaincode
 # peer lifecycle chaincode querycommitted --channelID mychannel --name basic
@@ -170,7 +245,8 @@ export CC_NAME=basic
 ```
 rsync -avh ./explorer manager:/home/ubuntu/hlf-docker-swarm/
 
-./exporer/setup.sh # change the json
+cd explorer
+./setup.sh # change the json
 
 sudo docker stack deploy -c docker-compose.yaml hlf
 ```
