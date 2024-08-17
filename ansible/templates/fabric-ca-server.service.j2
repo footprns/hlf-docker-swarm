@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=ubuntu
-Environment="FABRIC_CA_HOME=/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/ordererOrg"
-Environment="FABRIC_CA_SERVER_CA_NAME=ca-orderer"
+Environment="FABRIC_CA_HOME=/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/{{ 'ordererOrg' if inventory_hostname == 'orderer' else inventory_hostname }}"
+Environment="FABRIC_CA_SERVER_CA_NAME=ca-{{ inventory_hostname }}"
 Environment="FABRIC_CA_SERVER_TLS_ENABLED=true"
 Environment="FABRIC_CA_SERVER_PORT={{ ca_port }}"
 ExecStart=/bin/sh -c "/home/ubuntu/hlf-docker-swarm/bin/fabric-ca-server start -b admin:adminpw -d"

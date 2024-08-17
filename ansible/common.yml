@@ -15,6 +15,40 @@
         remote_src: no
       loop:
         - bin
-        - chaincode
-        - explorer
+        # - chaincode
+        # - explorer
         - test-network
+
+    - name: Create systemd service file for Fabric CA Server
+      become: yes
+      template:
+        src: templates/fabric-ca-server.service.j2
+        dest: /etc/systemd/system/fabric-ca-server.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd daemon
+      become: yes
+      command: systemctl daemon-reload
+
+    - name: Enable and start Fabric CA Server service
+      become: yes
+      systemd:
+        name: fabric-ca-server
+        enabled: yes
+        state: started
+
+    - name: Check if ca-cert.pem file exists
+      stat:
+        path: /home/ubuntu/hlf-docker-swarm/test-network/organizations/{{ 'ordererOrganizations' if inventory_hostname == 'orderer' else 'peerOrganizations' }}
+      register: orderer_ca_cert
+
+    - name: Run registerEnroll.sh and createOrderer
+      shell: |
+        . ./organizations/fabric-ca/registerEnroll.sh
+        create{{ 'Orderer' if inventory_hostname == 'orderer' else inventory_hostname[0] | upper }}{{ '' if inventory_hostname == 'orderer' else inventory_hostname[1:] }}
+      args:
+        executable: /bin/bash
+        chdir: /home/ubuntu/hlf-docker-swarm/test-network
+      when: not orderer_ca_cert.stat.exists

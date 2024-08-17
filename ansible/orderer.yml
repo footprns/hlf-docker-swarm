@@ -22,16 +22,3 @@
         enabled: yes
         state: started
 
-    - name: Check if ca-cert.pem file exists
-      stat:
-        path: /home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/ordererOrg/ca-cert.pem
-      register: orderer_ca_cert
-
-    - name: Run registerEnroll.sh and createOrderer
-      shell: |
-        . ./organizations/fabric-ca/registerEnroll.sh
-        createOrderer
-      args:
-        executable: /bin/bash
-        chdir: /home/ubuntu/hlf-docker-swarm/test-network
-      when: not orderer_ca_cert.stat.exists

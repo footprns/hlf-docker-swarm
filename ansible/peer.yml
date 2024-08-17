@@ -2,30 +2,7 @@
 - name: Ensure environment variables are set in .profile
   hosts: peer_servers
   tasks:
-    - name: Create systemd service file for Fabric CA Server
-      become: yes
-      template:
-        src: templates/fabric-ca-server-peer.service.j2
-        dest: /etc/systemd/system/fabric-ca-server.service
-        owner: root
-        group: root
-        mode: '0644'
 
-    - name: Reload systemd daemon
-      become: yes
-      command: systemctl daemon-reload
-
-    - name: Enable and start Fabric CA Server service
-      become: yes
-      systemd:
-        name: fabric-ca-server
-        enabled: yes
-        state: started
-
-    - name: Check if ca-cert.pem file exists
-      stat:
-        path: /home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/{{ inventory_hostname }}.amandigital.net/ca/ca.{{ inventory_hostname }}.amandigital.net-cert.pem
-      register: orderer_ca_cert
 
     - name: Run registerEnroll.sh and createOrderer
       shell: |
