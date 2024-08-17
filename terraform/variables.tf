@@ -33,5 +33,7 @@ variable "fabric" {
     })
     worker2 = object({
     })
+    worker3 = object({
+    })
   })
 }

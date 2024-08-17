@@ -47,11 +47,13 @@ docker stack deploy -c docker/docker-compose-ca.yaml  hlf
 
 ## generate cat
 ```
-servers=("manager" "worker1" "worker2")
+servers=("manager" "worker1" "worker2" "worker3")
 
 for server in "${servers[@]}"; do
     echo "Syncing to $server..."
+    rsync -avh --relative ./hlf-docker-swarm/test-network "$server:/home/ubuntu/"
     rsync -avh --relative ./hlf-docker-swarm/bin "$server:/home/ubuntu/"
+    rsync -avh --relative ./hlf-docker-swarm/chaincode "$server:/home/ubuntu/"
     echo "Sync to $server completed."
 done
 
@@ -59,16 +61,17 @@ $ source ./organizations/fabric-ca/registerEnroll.sh
 createOrderer
 createOrg1
 createOrg2
-createOrt3
+createOrg3
 ```
 
 ## copy org2 and 3 to master node
 ```
 ssh-keygen -t ed25519 -C "iman@amandigital.net"
+echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDTUi/k9Ck3XnrrXgy4UegGPTarfUq8jbzvmViaACnTC iman@amandigital.net | tee -a ~/.ssh/authorized_keys 
 $ sudo chown -R ubuntu:ubuntu ./
 
-servers=("worker1" "worker2")
-folders=("org2" "org3")
+servers=("worker1" "worker2" "worker3")
+folders=("org1" "org2" "org3")
 
 for i in "${!servers[@]}"; do
     server="${servers[$i]}"
@@ -81,14 +84,12 @@ for i in "${!servers[@]}"; do
     echo "Sync to ./$folder completed."
 done
 
-servers=("worker1" "worker2")
-orgs=("org2.example.com" "org3.example.com")
+servers=("worker1" "worker2" "worker3")
+orgs=("org1.example.com" "org2.example.com" "org3.example.com")
 
 for i in "${!servers[@]}"; do
     server="${servers[$i]}"
     org="${orgs[$i]}"
-    
-    echo "Syncing from $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/$org to ./peerOrganizations"
     
     rsync -avh "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/$org" "./peerOrganizations"
     
@@ -99,10 +100,9 @@ done
 ```
 ## copy orders to other node
 ```
-servers=("worker1" "worker2")
+servers=("worker1" "worker2" "worker3")
 
 for server in "${servers[@]}"; do
-    echo "Syncing ./ordererOrganizations to $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/"
     
     rsync -avh ./ordererOrganizations "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/"
     
@@ -120,7 +120,7 @@ done
 export CHANNEL_NAME=mychannel
 ./scripts/createChannelTx.sh
 
-servers=("worker1" "worker2")
+servers=("worker1" "worker2" "worker3")
 
 for server in "${servers[@]}"; do
     echo "Syncing ./channel-artifacts to $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/"
@@ -157,10 +157,9 @@ export CHANNEL_NAME=mychannel
 
 ## join the channel , copy the block file to other peer
 ```
-servers=("worker1" "worker2")
+servers=("worker1" "worker2" "worker3")
 
 for server in "${servers[@]}"; do
-    echo "Syncing ./channel-artifacts/mychannel.block to $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts"
     
     rsync -avh ./channel-artifacts/mychannel.block "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts"
     

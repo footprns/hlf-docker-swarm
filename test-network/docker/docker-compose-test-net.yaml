@@ -219,7 +219,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.name == manager
+          - node.labels.name == worker3
     container_name: peer0.org1.example.com
     image: hyperledger/fabric-peer:2.3
     environment:
@@ -267,7 +267,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.name == worker1
+          - node.labels.name == worker2
     container_name: peer0.org2.example.com
     image: hyperledger/fabric-peer:2.3
     environment:
@@ -315,7 +315,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.name == worker2
+          - node.labels.name == worker3
     container_name: peer0.org3.example.com
     image: hyperledger/fabric-peer:2.3
     environment:

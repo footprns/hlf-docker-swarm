@@ -22,7 +22,7 @@
 resource "aws_instance" "fabric" {
   for_each                    = var.fabric
   ami                         = "ami-0be48b687295f8bd6" # ubuntu 22.04
-  instance_type               = "t3.medium"
+  instance_type               = "t3.micro"
   user_data                   = <<-EOF
                                 #!/bin/bash
                                 # echo "your-hostname" > /etc/hostname
