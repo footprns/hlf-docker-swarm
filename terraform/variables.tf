@@ -24,16 +24,22 @@ variable "ec2_network" {
   })
 }
 
+# variable "fabric" {
+#   description = "Configuration for fabric node"
+#   type = object({
+#     manager = object({
+#     })
+#     worker1 = object({
+#     })
+#     worker2 = object({
+#     })
+#     worker3 = object({
+#     })
+#   })
+# }
+
 variable "fabric" {
-  description = "Configuration for fabric node"
-  type = object({
-    manager = object({
-    })
-    worker1 = object({
-    })
-    worker2 = object({
-    })
-    worker3 = object({
-    })
-  })
+  type = map(object({
+    dns = list(string)
+  }))
 }

@@ -53,7 +53,7 @@ resource "aws_instance" "fabric" {
   source_dest_check           = true
   vpc_security_group_ids      = [aws_security_group.fabric["fabric"].id]
   root_block_device {
-    delete_on_termination = false
+    delete_on_termination = true
     volume_size           = 20
     volume_type           = "gp2"
   }

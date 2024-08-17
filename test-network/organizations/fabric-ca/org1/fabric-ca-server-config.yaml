@@ -303,17 +303,17 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-  cn: ca.org1.example.com
+  cn: ca.org1.amandigital.net
   names:
     - C: US
       ST: "North Carolina"
       L: "Durham"
-      O: org1.example.com
+      O: org1.amandigital.net
       OU:
   hosts:
     - localhost
-    - org1.example.com
-    - peer0.org1.example.com
+    - org1.amandigital.net
+    - peer0.org1.amandigital.net
     -
   ca:
     expiry: 131400h

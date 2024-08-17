@@ -30,7 +30,7 @@ services:
     networks:
       test:
         aliases:
-          - couchdb0.example.com
+          - couchdb0.amandigital.net
 
   peer0org1examplecom:
     deploy:
@@ -39,7 +39,7 @@ services:
           - node.labels.name == worker1
     environment:
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.example.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.amandigital.net:5984
       # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
       # provide the credentials for ledger to connect to CouchDB.  The username and password must
       # match the username and password set for the associated CouchDB.
@@ -67,7 +67,7 @@ services:
     networks:
       test:
         aliases:
-          - couchdb1.example.com
+          - couchdb1.amandigital.net
 
   peer0org2examplecom:
     deploy:
@@ -76,7 +76,7 @@ services:
           - node.labels.name == worker2
     environment:
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1.example.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1.amandigital.net:5984
       # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
       # provide the credentials for ledger to connect to CouchDB.  The username and password must
       # match the username and password set for the associated CouchDB.
@@ -104,7 +104,7 @@ services:
     networks:
       test:
         aliases:
-          - couchdb2.example.com
+          - couchdb2.amandigital.net
 
   peer0org3examplecom:
     deploy:
@@ -113,7 +113,7 @@ services:
           - node.labels.name == worker3
     environment:
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2.example.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2.amandigital.net:5984
       # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
       # provide the credentials for ledger to connect to CouchDB.  The username and password must
       # match the username and password set for the associated CouchDB.

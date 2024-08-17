@@ -1,7 +1,7 @@
 Docker initialize
 ```
 docker swarm init --default-addr-pool 10.0.0.0/8 --default-addr-pool-mask-length 16 --advertise-addr ens5
-docker swarm init --advertise-addr ens5
+sudo docker swarm init --advertise-addr ens5
 ```
 output
 ```
@@ -13,7 +13,7 @@ check `docker node list`
 
 create overlay network
 ```
-docker network create --driver=overlay --attachable test
+sudo docker network create --driver=overlay --attachable test
 ilcqd2f6rvuq0bb4fx0btu3jv
 
 docker network create --driver=overlay --subnet 192.168.15.0/24 --attachable test
@@ -31,9 +31,10 @@ then make link
 
 ## label node
 ```
-sudo docker node update --label-add name=manager ysw70oqlxb1z4y6s5zinslacw
-sudo docker node update --label-add name=worker1 j13p1yht2sopek1jenn90o7oo
-sudo docker node update --label-add name=worker2 a27ehdcdo25tydnwppruesqvy
+sudo docker node update --label-add name=manager kpcla9jwlacn0v96x96rcqusa
+sudo docker node update --label-add name=worker1 g351poowguil69stsb3m7b4pq
+sudo docker node update --label-add name=worker2 uhj8c2ua4l47fmqzc7z8ypvcz
+sudo docker node update --label-add name=worker3 0ju33zei0910g34pzvkjvncyr
 
 # list label
 sudo docker node ls -q | sudo xargs docker node inspect \
@@ -42,7 +43,7 @@ sudo docker node ls -q | sudo xargs docker node inspect \
 
 ## run ca
 ```
-docker stack deploy -c docker/docker-compose-ca.yaml  hlf
+sudo docker stack deploy -c docker/docker-compose-ca.yaml  hlf
 ```
 
 ## generate cat
@@ -67,7 +68,7 @@ createOrg3
 ## copy org2 and 3 to master node
 ```
 ssh-keygen -t ed25519 -C "iman@amandigital.net"
-echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINeKOWL9iT1jkge5ZyA+80z1+kio6iJQWcZiHKAko3ny iman@amandigital.net | tee -a ~/.ssh/authorized_keys 
+echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILWMvOJwPSHJ2nwJih1LqwZYvJzu6+oJzpvvSH9VfSsa iman@amandigital.net | tee -a ~/.ssh/authorized_keys 
 $ sudo chown -R ubuntu:ubuntu ./
 
 servers=("worker1" "worker2" "worker3")
@@ -84,8 +85,10 @@ for i in "${!servers[@]}"; do
     echo "Sync to ./$folder completed."
 done
 
+mkdir peerOrganizations
+
 servers=("worker1" "worker2" "worker3")
-orgs=("org1.example.com" "org2.example.com" "org3.example.com")
+orgs=("org1.amandigital.net" "org2.amandigital.net" "org3.amandigital.net")
 
 for i in "${!servers[@]}"; do
     server="${servers[$i]}"
@@ -158,6 +161,7 @@ for server in "${servers[@]}"; do
     echo "Sync to $server.amandigital.net completed."
 done
 
+below command run from each peer docker cli
 $ export CHANNEL_NAME=mychannel
 $ peer channel join -b ./channel-artifacts/mychannel.block
 
@@ -183,7 +187,7 @@ $ chmod 600 ~/.ssh/id_ed25519
 $ sudo chown -R ubuntu:ubuntu ./
 
 then copy to other peer
-servers=("worker2" "worker3")
+servers=("worker1" "worker2" "worker3")
 
 for server in "${servers[@]}"; do
     
@@ -218,7 +222,7 @@ export CHANNEL_NAME=mychannel
 ```
 export CC_NAME=basic
 export CHANNEL_NAME=mychannel
-./scripts/commit_cc.sh # one time only
+./scripts/commit_cc.sh # one time only from orderer
 
 check the commited chaincode # from endorser
 # peer lifecycle chaincode querycommitted --channelID mychannel --name basic

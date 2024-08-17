@@ -13,8 +13,8 @@ networks:
 services:
   explorerdbmynetworkcom:
     image: hyperledger/explorer-db:latest
-    container_name: explorerdb.mynetwork.com
-    hostname: explorerdb.mynetwork.com
+    container_name: explorerdb.amandigital.net
+    hostname: explorerdb.amandigital.net
     environment:
       - DATABASE_DATABASE=fabricexplorer
       - DATABASE_USERNAME=hppoc
@@ -29,7 +29,7 @@ services:
     networks:
       test:
         aliases:
-          - explorerdb.mynetwork.com
+          - explorerdb.amandigital.net
 
   explorermynetworkcom:
     deploy:
@@ -37,10 +37,10 @@ services:
        constraints:
          - node.labels.name == manager
     image: hyperledger/explorer:latest
-    container_name: explorer.mynetwork.com
-    hostname: explorer.mynetwork.com
+    container_name: explorer.amandigital.net
+    hostname: explorer.amandigital.net
     environment:
-      - DATABASE_HOST=explorerdb.mynetwork.com
+      - DATABASE_HOST=explorerdb.amandigital.net
       - DATABASE_DATABASE=fabricexplorer
       - DATABASE_USERNAME=hppoc
       - DATABASE_PASSWD=password
@@ -61,4 +61,4 @@ services:
     networks:
       test:
         aliases:
-          - explorer.mynetwork.com
+          - explorer.amandigital.net

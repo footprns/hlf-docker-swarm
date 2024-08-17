@@ -31,7 +31,7 @@ services:
     networks:
        test:
          aliases:
-          - ca.org1.example.com
+          - ca.org1.amandigital.net
 
   ca_org2:
     deploy:
@@ -53,7 +53,7 @@ services:
     networks:
        test:
          aliases:
-          - ca.org2.example.com
+          - ca.org2.amandigital.net
   ca_org3:
     deploy:
       placement:
@@ -74,7 +74,7 @@ services:
     networks:
        test:
          aliases:
-          - ca.org3.example.com
+          - ca.org3.amandigital.net
 
   ca_orderer:
     deploy:
@@ -96,4 +96,4 @@ services:
     networks:
        test:
          aliases:
-          - ca.orderer.example.com
+          - ca.orderer.amandigital.net
