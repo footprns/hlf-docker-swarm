@@ -78,8 +78,6 @@ for i in "${!servers[@]}"; do
     server="${servers[$i]}"
     folder="${folders[$i]}"
     
-    echo "Syncing from $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/$folder/ to ./$folder"
-    
     rsync -avh "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/$folder/" "./$folder"
     
     echo "Sync to ./$folder completed."

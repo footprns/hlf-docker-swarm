@@ -1,0 +1,20 @@
+---
+- name: Copy folders to remote server
+  hosts: fabric_servers
+  tasks:
+    - name: Ensure directories exist on the remote server
+      file:
+        path: "/home/ubuntu/hlf-docker-swarm"
+        state: directory
+
+    - name: Copy folders to the remote server
+      copy:
+        src: "../{{ item }}"
+        dest: "/home/ubuntu/hlf-docker-swarm"
+        mode: '0755'
+        remote_src: no
+      loop:
+        - bin
+        - chaincode
+        - explorer
+        - test-network
