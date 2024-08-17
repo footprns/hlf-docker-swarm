@@ -15,7 +15,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.name == worker1
+          - node.labels.name == manager
     environment:
       - SYS_CHANNEL=system-channel
       - GOPATH=/opt/gopath

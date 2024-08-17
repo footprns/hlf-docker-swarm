@@ -67,7 +67,7 @@ createOrg3
 ## copy org2 and 3 to master node
 ```
 ssh-keygen -t ed25519 -C "iman@amandigital.net"
-echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDTUi/k9Ck3XnrrXgy4UegGPTarfUq8jbzvmViaACnTC iman@amandigital.net | tee -a ~/.ssh/authorized_keys 
+echo ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINeKOWL9iT1jkge5ZyA+80z1+kio6iJQWcZiHKAko3ny iman@amandigital.net | tee -a ~/.ssh/authorized_keys 
 $ sudo chown -R ubuntu:ubuntu ./
 
 servers=("worker1" "worker2" "worker3")
@@ -112,6 +112,7 @@ done
 
 ## create genesis block
 ```
+export CHANNEL_NAME=mychannel
 ./scripts/createGenesis.sh
 ```
 
@@ -123,7 +124,6 @@ export CHANNEL_NAME=mychannel
 servers=("worker1" "worker2" "worker3")
 
 for server in "${servers[@]}"; do
-    echo "Syncing ./channel-artifacts to $server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/"
     
     rsync -avh ./channel-artifacts "ubuntu@$server.amandigital.net:/home/ubuntu/hlf-docker-swarm/test-network/"
     
@@ -134,14 +134,6 @@ done
 
 ## start container
 ```
-servers=("manager" "worker1" "worker2")
-
-for server in "${servers[@]}"; do
-    echo "Syncing to $server..."
-    rsync -avh --relative ./hlf-docker-swarm/chaincode "$server:/home/ubuntu/"
-    echo "Sync to $server completed."
-done
-
 sudo docker stack deploy -c docker/docker-compose-couch.yaml -c docker/docker-compose-test-net.yaml hlf
 
 
@@ -152,7 +144,7 @@ sudo docker stack deploy -c docker/docker-compose-couch.yaml -c docker/docker-co
 $ sudo docker stack deploy -c docker/docker-compose-cli.yaml  hlf
 $ sudo docker exec -it dc8dd7d6502c bash
 export CHANNEL_NAME=mychannel
-./scripts/create_app_channel.sh
+./scripts/create_app_channel.sh # from orderer only
 ```
 
 ## join the channel , copy the block file to other peer
@@ -166,7 +158,7 @@ for server in "${servers[@]}"; do
     echo "Sync to $server.amandigital.net completed."
 done
 
-
+$ export CHANNEL_NAME=mychannel
 $ peer channel join -b ./channel-artifacts/mychannel.block
 
 check the join
@@ -182,14 +174,16 @@ peer channel list
 
 ## package the chaincode
 ```
-copy the code
-$ rsync -avh ./chaincode manager:/home/ubuntu/hlf-docker-swarm/
 
 export CC_NAME=basic
 ./scripts/package_cc.sh
 
+$ scp /home/ubuntu/.ssh/id_ed25519 worker1.amandigital.net:/home/ubuntu/.ssh
+$ chmod 600 ~/.ssh/id_ed25519 
+$ sudo chown -R ubuntu:ubuntu ./
+
 then copy to other peer
-servers=("worker1" "worker2")
+servers=("worker2" "worker3")
 
 for server in "${servers[@]}"; do
     
@@ -226,7 +220,7 @@ export CC_NAME=basic
 export CHANNEL_NAME=mychannel
 ./scripts/commit_cc.sh # one time only
 
-check the commited chaincode
+check the commited chaincode # from endorser
 # peer lifecycle chaincode querycommitted --channelID mychannel --name basic
 ```
 
