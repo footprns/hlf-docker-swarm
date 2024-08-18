@@ -5,7 +5,7 @@ sudo docker swarm init --advertise-addr ens5
 ```
 output
 ```
-    docker swarm join --token SWMTKN-1-2gk3gx5e371rze3ktf61yooqvnjzwtbxdyaz2zmjuy0qrucmo4-0qn2x6yr80vwk78vtbglqhfdx 192.168.101.25:2377
+docker swarm join --token SWMTKN-1-0qrejso0tc933anixil6r2etae9i2wu0r7c0uggae3p5hnrnvu-ejt007qafc9q57icniecepwgt 192.168.101.27:2377
 
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 ```
@@ -31,10 +31,10 @@ then make link
 
 ## label node
 ```
-sudo docker node update --label-add name=manager kpcla9jwlacn0v96x96rcqusa
-sudo docker node update --label-add name=worker1 g351poowguil69stsb3m7b4pq
-sudo docker node update --label-add name=worker2 uhj8c2ua4l47fmqzc7z8ypvcz
-sudo docker node update --label-add name=worker3 0ju33zei0910g34pzvkjvncyr
+sudo docker node update --label-add name=manager n4he1poila7dz62lochm1pzjd
+sudo docker node update --label-add name=worker1 k2yyk3dqbb4gbybhi610nx7r0
+sudo docker node update --label-add name=worker2 ipa8onj860m88pn0x3sfscfpy
+sudo docker node update --label-add name=worker3 scwgr5s7fkastvskadtnn7ib2
 
 # list label
 sudo docker node ls -q | sudo xargs docker node inspect \

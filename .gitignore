@@ -38,3 +38,6 @@ override.tf.json
 terraform.rc
 
 vault-cluster-vault-2024-08-09T12_16_19.101Z.json
+ansible/channel-artifacts
+ansible/fabric-ca
+ansible/peerOrganizations

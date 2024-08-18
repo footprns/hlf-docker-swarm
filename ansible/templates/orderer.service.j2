@@ -1,0 +1,32 @@
+[Unit]
+Description=Orderer Server
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/gopath/src/github.com/hyperledger/fabric
+
+Environment="FABRIC_CFG_PATH=/home/ubuntu/config"
+Environment="FABRIC_LOGGING_SPEC=INFO"
+Environment="ORDERER_GENERAL_LISTENADDRESS=0.0.0.0"
+Environment="ORDERER_GENERAL_LISTENPORT=7050"
+Environment="ORDERER_GENERAL_GENESISMETHOD=file"
+Environment="ORDERER_GENERAL_GENESISFILE=/home/ubuntu/hlf-docker-swarm/test-network/system-genesis-block/genesis.block"
+Environment="ORDERER_GENERAL_LOCALMSPID=OrdererMSP"
+Environment="ORDERER_GENERAL_LOCALMSPDIR=/home/ubuntu/hlf-docker-swarm/test-network/organizations/ordererOrganizations/amandigital.net/orderers/orderer.amandigital.net/msp"
+Environment="ORDERER_GENERAL_TLS_ENABLED=true"
+Environment="ORDERER_GENERAL_TLS_PRIVATEKEY=/home/ubuntu/hlf-docker-swarm/test-network/organizations/ordererOrganizations/amandigital.net/orderers/orderer.amandigital.net/tls/server.key"
+Environment="ORDERER_GENERAL_TLS_CERTIFICATE=/home/ubuntu/hlf-docker-swarm/test-network/organizations/ordererOrganizations/amandigital.net/orderers/orderer.amandigital.net/tls/server.crt"
+Environment="ORDERER_GENERAL_TLS_ROOTCAS=[/home/ubuntu/hlf-docker-swarm/test-network/organizations/ordererOrganizations/amandigital.net/orderers/orderer.amandigital.net/tls/ca.crt]"
+Environment="ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1"
+Environment="ORDERER_KAFKA_VERBOSE=true"
+Environment="ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/home/ubuntu/hlf-docker-swarm/test-network/organizations/ordererOrganizations/amandigital.net/orderers/orderer.amandigital.net/tls/server.crt"
+Environment="ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/home/ubuntu/hlf-docker-swarm/test-network/organizations/ordererOrganizations/amandigital.net/orderers/orderer.amandigital.net/tls/server.key"
+Environment="ORDERER_GENERAL_CLUSTER_ROOTCAS=[/home/ubuntu/hlf-docker-swarm/test-network/organizations/ordererOrganizations/amandigital.net/orderers/orderer.amandigital.net/tls/ca.crt]"
+
+ExecStart=/bin/sh -c "/home/ubuntu/bin/orderer"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

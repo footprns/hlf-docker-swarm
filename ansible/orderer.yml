@@ -2,23 +2,75 @@
 - name: Ensure environment variables are set in .profile
   hosts: orderer_servers
   tasks:
-    - name: Create systemd service file for Fabric CA Server
+
+    - name: Fetch fabric-ca files from local to remote
+      synchronize:
+        src: "fabric-ca/{{ item }}"
+        dest: "/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/"
+        recursive: yes
+        delete: no
+      loop:
+        - org1
+        - org2
+        - org3
+
+    - name: Fetch peerOrganizations files from local to remote
+      synchronize:
+        src: "peerOrganizations"
+        dest: "/home/ubuntu/hlf-docker-swarm/test-network/organizations/"
+        recursive: yes
+        delete: no
+
+    - name: Check if genesis block file exists
+      stat:
+        path: /home/ubuntu/hlf-docker-swarm/test-network/system-genesis-block/genesis.block
+      register: genesis_block
+
+    - name: Set genesis block CHANNEL_NAME environment variable
+      shell: |
+        export CHANNEL_NAME=mychannel
+        ./scripts/createGenesis.sh
+        ./scripts/createChannelTx.sh
+      args:
+        executable: /bin/bash
+        chdir: /home/ubuntu/hlf-docker-swarm/test-network # Change to the directory where your scripts are located
+      environment:
+        CHANNEL_NAME: mychannel
+      when: not genesis_block.stat.exists
+
+    - name: Fetch channel-artifacts files from remote to local
+      synchronize:
+        src: "/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts/"
+        dest: "channel-artifacts"
+        mode: pull
+        recursive: yes
+        delete: no
+
+    - name: Create /var/hyperledger directory
+      file:
+        path: /var/hyperledger
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Create systemd service file for Orderer Server
       become: yes
       template:
-        src: templates/fabric-ca-server.service.j2
-        dest: /etc/systemd/system/fabric-ca-server.service
+        src: templates/orderer.service.j2
+        dest: /etc/systemd/system/orderer.service
         owner: root
         group: root
         mode: '0644'
-
+    
     - name: Reload systemd daemon
       become: yes
       command: systemctl daemon-reload
 
-    - name: Enable and start Fabric CA Server service
+    - name: Enable and start Orderer Server service
       become: yes
       systemd:
-        name: fabric-ca-server
+        name: orderer
         enabled: yes
         state: started
 

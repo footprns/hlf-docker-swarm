@@ -45,6 +45,9 @@ resource "aws_instance" "fabric" {
                                 VERSION_STRING=5:23.0.0-1~ubuntu.22.04~jammy
                                 sudo apt-get install -y docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
                                 docker run hello-world
+                                cd /home/ubuntu
+                                curl -o /home/ubuntu/install-fabric.sh -sSL https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh && chmod +x install-fabric.sh
+                                /home/ubuntu/install-fabric.sh --fabric-version 2.5.9 binary
                                 EOF
   availability_zone           = var.ec2_network.availability_zone
   subnet_id                   = var.ec2_network.subnet_id

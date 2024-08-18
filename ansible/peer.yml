@@ -2,19 +2,36 @@
 - name: Ensure environment variables are set in .profile
   hosts: peer_servers
   tasks:
+    - name: Ensure destination directory exists
+      local_action:
+        module: file
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - fabric-ca
+        - peerOrganizations
 
+    - name: Fetch fabric-ca files from remote to local
+      synchronize:
+        src: "/home/ubuntu/hlf-docker-swarm/test-network/organizations/fabric-ca/{{ inventory_hostname }}"
+        dest: "fabric-ca/"
+        mode: pull
+        recursive: yes
+        delete: no
 
-    - name: Run registerEnroll.sh and createOrderer
-      shell: |
-        . ./organizations/fabric-ca/registerEnroll.sh
-        create{{ inventory_hostname[0] | upper }}{{ inventory_hostname[1:] }}
-      args:
-        executable: /bin/bash
-        chdir: /home/ubuntu/hlf-docker-swarm/test-network
-      when: not orderer_ca_cert.stat.exists
+    - name: Fetch peerOrganization files from remote to local
+      synchronize:
+        src: "/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/"
+        dest: "peerOrganizations"
+        mode: pull
+        recursive: yes
+        delete: no
 
-    - name: Fetch files from remote to local
-      fetch:
-        src: "/home/ubuntu/hlf-docker-swarm/test-network/organizations/peerOrganizations/{{ inventory_hostname }}.amandigital.net"
-        dest: "../test-network/organizations/peerOrganizations/{{ inventory_hostname }}"
-        flat: yes
+    - name: Push channel-artifacts files from local to remote
+      synchronize:
+        src: "channel-artifacts"
+        dest: "/home/ubuntu/hlf-docker-swarm/test-network/channel-artifacts/"
+        recursive: yes
+        delete: no
+
+        
