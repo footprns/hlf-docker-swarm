@@ -48,6 +48,8 @@ resource "aws_instance" "fabric" {
                                 cd /home/ubuntu
                                 curl -o /home/ubuntu/install-fabric.sh -sSL https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh && chmod +x install-fabric.sh
                                 /home/ubuntu/install-fabric.sh --fabric-version 2.5.9 binary
+                                git clone https://github.com/hyperledger/fabric-samples.git /home/ubuntu/fabric-samples
+                                ln -s /home/ubuntu/config/ /home/ubuntu/fabric-samples/config
                                 EOF
   availability_zone           = var.ec2_network.availability_zone
   subnet_id                   = var.ec2_network.subnet_id
